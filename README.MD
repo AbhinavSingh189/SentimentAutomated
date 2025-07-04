@@ -65,3 +65,17 @@ Specify the column containing the text for analysis
 results.csv: Predictions and confidence scores
 
 report.pdf: Multi-page visual summary of sentiment analysis
+
+## Results 
+
+![Page_1_Analysis](results_images/Page1(Analysis).png)
+![Page_2_Analysis](results_images/sentimentCount.png)
+![Page_3_Analysis](results_images/sentimentProportion.png)
+![Page_4_Analysis](results_images/sentimentDonut.png)
+![Page_5_Analysis](results_images/confidenceScatter.png)
+![Page_6_Analysis](results_images/corrHeat.png)
+![Page_7_Analysis](results_images/negCloud.png)
+![Page_8_Analysis](results_images/posCloud.png)
+![Page_9_Analysis](results_images/sentChunk.png)
+
+

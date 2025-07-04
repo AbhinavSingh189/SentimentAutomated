@@ -44,24 +44,24 @@ def predict(text):
 
 print("Analyzing full dataset...")
 results = [predict(txt) for txt in tqdm(texts, desc="Processing")]
-df[['sent', 'conf']] = results
+df[['Sentiment', 'Confidence']] = results
 
 # Export results
 df.to_csv("results.csv", index=False)
-df['score'] = df['sent'].map({'Negative': -1, 'Neutral': 0, 'Positive': 1})
+df['score'] = df['Sentiment'].map({'Negative': -1, 'Neutral': 0, 'Positive': 1})
 
 # Plot settings
 sns.set(style="whitegrid")
-sent_counts = df['sent'].value_counts().reindex(labels, fill_value=0)
-avg_conf = df['conf'].mean()
-high_conf_count = df[df['conf'] > 0.9].shape[0]
+sent_counts = df['Sentiment'].value_counts().reindex(labels, fill_value=0)
+avg_conf = df['Confidence'].mean()
+high_conf_count = df[df['Confidence'] > 0.9].shape[0]
 
 # PDF Report
 with PdfPages("report.pdf") as pdf:
 
     # Page 1: Summary
     summary = f"""
-Sentiment Analysis Report (Full Dataset)
+Sentiment Analysis Report (Complete Dataset)
 
 Overview:
 This report presents an automatic sentiment classification of text data using a RoBERTa model trained on Twitter posts. The sentiments are categorized into three primary classes:
@@ -94,7 +94,7 @@ Observations:
     sent_counts.plot(kind='bar', color=[colors[l] for l in labels])
     plt.title("Sentiment Count", fontsize=14)
     plt.ylabel("Reviews", fontsize=12)
-    plt.xticks(fontsize=11)
+    plt.xticks(rotation=0, fontsize=11)
     plt.yticks(fontsize=11)
     pdf.savefig(); plt.close()
 
@@ -115,8 +115,8 @@ Observations:
     # Page 5: Scatter plot
     plt.figure()
     for label in labels:
-        group = df[df['sent'] == label]
-        plt.scatter(group.index, group['conf'], alpha=0.4, label=label, color=colors[label])
+        group = df[df['Sentiment'] == label]
+        plt.scatter(group.index, group['Confidence'], alpha=0.4, label=label, color=colors[label])
     plt.title("Confidence Scatter Plot", fontsize=14)
     plt.xlabel("Index", fontsize=12)
     plt.ylabel("Confidence", fontsize=12)
@@ -127,13 +127,13 @@ Observations:
 
     # Page 6: Heatmap
     plt.figure()
-    sns.heatmap(df[['score', 'conf']].corr(), annot=True, cmap='coolwarm')
+    sns.heatmap(df[['score', 'Confidence']].corr(), annot=True, cmap='coolwarm')
     plt.title("Correlation Heatmap", fontsize=14)
     pdf.savefig(); plt.close()
 
     # Page 7: Word Clouds
     for label in labels:
-        filtered_texts = df[df['sent'] == label][col].dropna().astype(str)
+        filtered_texts = df[df['Sentiment'] == label][col].dropna().astype(str)
         words = " ".join(filtered_texts)
         wc = WordCloud(width=800, height=400, background_color='white').generate(words)
         plt.figure(figsize=(8, 4))
@@ -144,7 +144,7 @@ Observations:
 
     # Page 8: Box plot
     plt.figure()
-    sns.boxplot(x='sent', y='conf', data=df, order=labels, palette=colors)
+    sns.boxplot(x='Sentiment', y='Confidence', data=df, order=labels, palette=colors)
     plt.title("Confidence by Sentiment", fontsize=14)
     plt.xlabel("Sentiment", fontsize=12)
     plt.ylabel("Confidence", fontsize=12)
@@ -153,15 +153,15 @@ Observations:
     pdf.savefig(); plt.close()
 
     # Page 9: Stacked Bar Chart
-    df['batch'] = (df.index // 500) + 1
-    stack_df = df.groupby(['batch', 'sent']).size().unstack(fill_value=0).reindex(columns=labels)
-    plt.figure(figsize=(8, 4))
+    df['Chunk'] = (df.index // 500) + 1
+    stack_df = df.groupby(['Chunk', 'Sentiment']).size().unstack(fill_value=0).reindex(columns=labels)
+    plt.figure(figsize=(10, 4))
     stack_df.plot(kind='bar', stacked=True, color=[colors[l] for l in labels])
     plt.title("Sentiment Over Chunks (500 rows each)", fontsize=14)
     plt.xlabel("Chunk", fontsize=12)
     plt.ylabel("Review Count", fontsize=12)
-    plt.xticks(fontsize=11)
-    plt.yticks(fontsize=11)
+    plt.xticks(rotation=0, fontsize=10)
+    plt.yticks(fontsize=10)
     plt.tight_layout()
     pdf.savefig(); plt.close()
 
